@@ -9,6 +9,8 @@ maven-archiver
 surefire
 test-classes
 dependency-reduced-pom.xml
+.gitattributes
+.gitignore
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
