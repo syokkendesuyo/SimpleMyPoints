@@ -29,7 +29,7 @@ import org.mcstats.Metrics;
 
 public class SimpleMyPoints extends JavaPlugin implements Listener {
 
-	String version = "0.0.1 (BetaBuild)";
+	String version = "0.0.2 (BetaBuild)";
 
 	@Override
 	public void onEnable() {
@@ -229,14 +229,9 @@ public class SimpleMyPoints extends JavaPlugin implements Listener {
 			}
 			//ワープコマンド
 			else if (cmd.getName().equalsIgnoreCase("warp")){
-				String points = args[0];
-				if(sender.hasPermission("smp.warp." + points)){
-					if(args.length == 0){
-						String point = "*warp*";
-						teleport(point,sender);
-					}
-					else if(args.length == 1){
-						String point = args[0].toString();
+				if(args.length == 0){
+					String point = "*warp*";
+					if(sender.hasPermission("smp.warp." + point)){
 						try{
 							teleport(point,sender);
 						}
@@ -245,11 +240,25 @@ public class SimpleMyPoints extends JavaPlugin implements Listener {
 						}
 					}
 					else{
-						sender.sendMessage(ChatColor.RED + "□ コマンドが不正です。(理由：引数が多すぎます)");
+						sender.sendMessage(ChatColor.RED + "□ パーミッションがありません。(smp.warp." + point + ")");
+					}
+				}
+				else if(args.length == 1){
+					String point = args[0].toString();
+					if(sender.hasPermission("smp.warp." + point)){
+						try{
+							teleport(point,sender);
+						}
+						catch(NullPointerException ex){//データ破損が確認された場合の処理
+							sender.sendMessage(ChatColor.RED + "□ "+ point + " へテレポートできませんでした。(理由：データ破損)");
+						}
+					}
+					else{
+						sender.sendMessage(ChatColor.RED + "□ パーミッションがありません。(smp.warp." + point + ")");
 					}
 				}
 				else{
-					sender.sendMessage(ChatColor.RED + "□ パーミッションがありません。(smp.warp)");
+					sender.sendMessage(ChatColor.RED + "□ コマンドが不正です。(理由：引数が多すぎます)");
 				}
 			}
 		}
@@ -261,22 +270,27 @@ public class SimpleMyPoints extends JavaPlugin implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent event){
 		Block block = event.getClickedBlock();
 		Player player = event.getPlayer();
-		if (block.getType().equals(Material.SIGN_POST) || block.getType().equals(Material.WALL_SIGN) && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			Sign sign = (Sign) block.getState();
-			if (sign.getLine(0).equalsIgnoreCase("[Teleport]") && player.hasPermission("smp.sign.warp." + sign.getLine(1))){
-				String tpto = sign.getLine(1);
-				if(sign.getLine(1).equalsIgnoreCase("")){
-					player.sendMessage(ChatColor.RED + "□ テレポートできませんでした。(理由：看板の2行目に記載がありません)");
-					return;
-				}
-				try{
-					teleport(tpto,player);
-				}
-				catch(NullPointerException ex){//データ破損が確認された場合の処理
-					player.sendMessage(ChatColor.RED + "□ "+ tpto + " へテレポートできませんでした。(理由：データ破損)");
-				}
-        	}
+		if (!(event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
+			return;
         }
+		else{
+			if(block.getType().equals(Material.SIGN_POST) || block.getType().equals(Material.WALL_SIGN)){
+				Sign sign = (Sign) block.getState();
+				if (sign.getLine(0).equalsIgnoreCase("[Teleport]") && player.hasPermission("smp.sign.warp." + sign.getLine(1))){
+					String tpto = sign.getLine(1);
+					if(sign.getLine(1).equalsIgnoreCase("")){
+						player.sendMessage(ChatColor.RED + "□ テレポートできませんでした。(理由：看板の2行目に記載がありません)");
+						return;
+					}
+					try{
+						teleport(tpto,player);
+					}
+					catch(NullPointerException ex){//データ破損が確認された場合の処理
+						player.sendMessage(ChatColor.RED + "□ "+ tpto + " へテレポートできませんでした。(理由：データ破損)");
+					}
+				}
+			}
+		}
 	}
 
 	//データをconfigに保存する関数(座標・視点)
