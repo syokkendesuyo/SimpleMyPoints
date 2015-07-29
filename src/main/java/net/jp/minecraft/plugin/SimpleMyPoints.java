@@ -29,7 +29,7 @@ import org.mcstats.Metrics;
 
 public class SimpleMyPoints extends JavaPlugin implements Listener {
 
-	String version = "0.0.2 (BetaBuild)";
+	String version = "0.0.3 (BetaBuild)";
 
 	@Override
 	public void onEnable() {
@@ -83,7 +83,7 @@ public class SimpleMyPoints extends JavaPlugin implements Listener {
 						}
 					}
 					else{
-						sender.sendMessage(ChatColor.AQUA + "□ コマンドが不正です。(理由：引数が多すぎます)");
+						sender.sendMessage(ChatColor.RED + "□ コマンドが不正です。(理由：引数が多すぎます)");
 					}
 				}
 				else if(args[0].equalsIgnoreCase("yaw")){
@@ -135,10 +135,9 @@ public class SimpleMyPoints extends JavaPlugin implements Listener {
 					}
 				}
 				else if(args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("register") || args[0].equalsIgnoreCase("add")){
-					sender.sendMessage(ChatColor.AQUA + "□ /points set <地点名> : 地点を新規で登録します!");
 					if(sender.hasPermission("smp.set") || sender.hasPermission("smp.register") || sender.hasPermission("smp.add")){
 						if(args.length == 1){
-							sender.sendMessage(ChatColor.AQUA + "□ /points set <地点名> : 地点を新規で登録します");
+							sender.sendMessage(ChatColor.AQUA + "□ /points " + args[0].toString() + " <地点名> : 地点を新規で登録します");
 						}
 						else if(args.length == 2){
 							String points = args[1].toString();
@@ -165,7 +164,7 @@ public class SimpleMyPoints extends JavaPlugin implements Listener {
 					}
 				}
 				//ワープコマンド /points warp <地点>
-				else if(args[0].equalsIgnoreCase("warp")){
+				else if(args[0].equalsIgnoreCase("warp") || args[0].equalsIgnoreCase("tp") || args[0].equalsIgnoreCase("teleport")){
 					if(args.length == 1){
 						if(sender.hasPermission("smp.warp.spawn")){
 							String point = "*warp*`";
@@ -209,7 +208,7 @@ public class SimpleMyPoints extends JavaPlugin implements Listener {
 				else if(args[0].equalsIgnoreCase("delete") || args[0].equalsIgnoreCase("remove")){
 					if(sender.hasPermission("smp.delete") || sender.hasPermission("smp.remove")){
 						if(args.length == 1){
-							sender.sendMessage(ChatColor.AQUA + "□ /points delete <地点名> : 登録地点を削除します");
+							sender.sendMessage(ChatColor.AQUA + "□ /points " + args[0].toString() + " <地点名> : 登録地点を削除します");
 						}
 						else if(args.length == 2){
 							String point = args[1].toString();
@@ -427,12 +426,12 @@ public class SimpleMyPoints extends JavaPlugin implements Listener {
 	public void help (CommandSender sender){
 		sender.sendMessage(ChatColor.AQUA + " /points help : ヘルプを表示");
 		sender.sendMessage(ChatColor.AQUA + " /points version : バージョンを表示");
-		sender.sendMessage(ChatColor.AQUA + " /points warp <地点名> : 登録地点へワープします");
-		sender.sendMessage(ChatColor.AQUA + " /points add <地点名> : 登録地点を追加します");
-		sender.sendMessage(ChatColor.AQUA + " /points detail <地点名> : 登録地点の詳細を表示します");
-		sender.sendMessage(ChatColor.AQUA + " /points delete <地点名> : 登録地点を削除します");
-		sender.sendMessage(ChatColor.AQUA + " /points yaw <地点名> <方角> : 登録地点の方角をセットします");
-		sender.sendMessage(ChatColor.AQUA + " /warp <地点名> : 登録地点へテレポートします");
+		sender.sendMessage(ChatColor.AQUA + " /points warp <地点名> : 登録地点へテレポート");
+		sender.sendMessage(ChatColor.AQUA + " /points add <地点名> : 登録地点を追加");
+		sender.sendMessage(ChatColor.AQUA + " /points detail <地点名> : 登録地点の詳細を表示");
+		sender.sendMessage(ChatColor.AQUA + " /points delete <地点名> : 登録地点を削除");
+		sender.sendMessage(ChatColor.AQUA + " /points yaw <地点名> <方角> : 登録地点の方角をセット");
+		sender.sendMessage(ChatColor.AQUA + " /warp <地点名> : 登録地点へテレポート");
 		sender.sendMessage("");
 	}
 
