@@ -1,23 +1,29 @@
 name: SimpleMyPoints
-version: 0.0.3
+version: 0.0.4
 main: net.jp.minecraft.plugin.SimpleMyPoints
 commands:
     points:
-        description: Simple my Points.
+        description: Simple My Points.
         usage: /points
-        permission: smp.command
-        permission-message: You don't have permission (smp.command)
+        permission: smp.help
+        permission-message: You don't have permission (smp.help)
     smp:
         description: Simple My Points.
         usage: /smp
-        permission: smp.command
-        permission-message: You don't have permission (smp.command)
+        permission: smp.help
+        permission-message: You don't have permission (smp.help)
     warp:
         description: Simple My Points.
         usage: /warp <PointName>
         permission: smp.warp
         permission-message: You don't have permission (smp.warp)
 permissions:
+    smp.help:
+        description: Simple My Points.
+        default: true
+    smp.warp:
+        description: Simple My Points.
+        default: true
     smp.*:
         description: Simple My Points.
         default: op

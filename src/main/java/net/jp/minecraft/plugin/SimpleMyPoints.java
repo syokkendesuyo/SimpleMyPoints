@@ -29,7 +29,7 @@ import org.mcstats.Metrics;
 
 public class SimpleMyPoints extends JavaPlugin implements Listener {
 
-	String version = "0.0.3 (BetaBuild)";
+	private String version = "0.0.4 (BetaBuild)";
 
 	@Override
 	public void onEnable() {
@@ -64,30 +64,49 @@ public class SimpleMyPoints extends JavaPlugin implements Listener {
 			Double z =player.getLocation().getZ();
 			float yaw = player.getLocation().getYaw();
 			float pitch = player.getLocation().getPitch();
+			String command = cmd.getLabel().toString();
 
 			if(cmd.getName().equalsIgnoreCase("points") || cmd.getName().equalsIgnoreCase("smp")){
 				if(args.length == 0){
-					//ヘルプの表示
-					title(sender);
-					help(sender);
+					if(!(sender.hasPermission(HelpCommand.getPermissonNode()))){
+						Messages.getPermissonError(sender, HelpCommand.getPermissonNode());
+						return true;
+					}
+					HelpCommand.getHepMessage(sender,cmd);
+					return true;
 				}
-				else if(args[0].equalsIgnoreCase("ver") || args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("help")){
-					if(args.length == 1){
-						if(args[0].equalsIgnoreCase("help")){
-							title(sender);
-							help(sender);
-						}
-						else{
-							title(sender);
-							auther(sender);
-						}
+				else if(args[0].equalsIgnoreCase("help")){
+					if(args.length > 1){
+						Messages.getArgumentTooMany(sender);
+						return true;
 					}
-					else{
-						sender.sendMessage(ChatColor.RED + "□ コマンドが不正です。(理由：引数が多すぎます)");
+					if(!(sender.hasPermission(HelpCommand.getPermissonNode()))){
+						Messages.getPermissonError(sender, HelpCommand.getPermissonNode());
+						return true;
 					}
+					HelpCommand.getHepMessage(sender,cmd);
+					return true;
+				}
+				else if(args[0].equalsIgnoreCase("ver") || args[0].equalsIgnoreCase("version")){
+					if(args.length > 1){
+						Messages.getPermissonError(sender, VersionCommand.getPermissonNode());
+						return true;
+					}
+					if(!(sender.hasPermission(VersionCommand.getPermissonNode()))){
+						Messages.getPermissonError(sender, VersionCommand.getPermissonNode());
+						return true;
+					}
+					VersionCommand.getVersion(sender,version);
+					return true;
 				}
 				else if(args[0].equalsIgnoreCase("yaw")){
 					if(sender.hasPermission("smp.yaw")){
+						if(args.length>3){
+							Messages.getArgumentTooMany(sender);
+							sender.sendMessage(ChatColor.AQUA + "□ /point yaw <地点名> <方角> : 地点の視点を<方角>にセットします");
+							sender.sendMessage(ChatColor.AQUA + "□ <方角> : north・south・east・west");
+							return true;
+						}
 						if(args.length == 1){
 							//points yawの実行
 							sender.sendMessage(ChatColor.AQUA + "□ /point yaw <地点名> <方角> : 地点の視点を<方角>にセットします");
@@ -127,17 +146,17 @@ public class SimpleMyPoints extends JavaPlugin implements Listener {
 							}
 						}
 						else{
-							sender.sendMessage(ChatColor.RED + "□ コマンドが不正です。(理由：引数が多すぎます)");
+							Messages.getArgumentTooMany(sender);
 						}
 					}
 					else{
-						sender.sendMessage(ChatColor.RED + "□ パーミッションがありません。(smp.yaw)");
+						Messages.getPermissonError(sender, "smp.yaw");
 					}
 				}
 				else if(args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("register") || args[0].equalsIgnoreCase("add")){
 					if(sender.hasPermission("smp.set") || sender.hasPermission("smp.register") || sender.hasPermission("smp.add")){
 						if(args.length == 1){
-							sender.sendMessage(ChatColor.AQUA + "□ /points " + args[0].toString() + " <地点名> : 地点を新規で登録します");
+							sender.sendMessage(ChatColor.AQUA + "□ /" + command + " " +args[0].toString() + " <地点名> : 地点を新規で登録します");
 						}
 						else if(args.length == 2){
 							String points = args[1].toString();
@@ -156,18 +175,18 @@ public class SimpleMyPoints extends JavaPlugin implements Listener {
 							}
 						}
 						else{
-							sender.sendMessage(ChatColor.RED + "□ コマンドが不正です。(理由：引数が多すぎます)");
+							Messages.getArgumentTooMany(sender);
 						}
 					}
 					else{
-						sender.sendMessage(ChatColor.RED + "□ パーミッションがありません。(smp.set/smp.register/smp.add)");
+						Messages.getPermissonError(sender, "smp.set/smp.register/smp.add");
 					}
 				}
 				//ワープコマンド /points warp <地点>
 				else if(args[0].equalsIgnoreCase("warp") || args[0].equalsIgnoreCase("tp") || args[0].equalsIgnoreCase("teleport")){
 					if(args.length == 1){
 						if(sender.hasPermission("smp.warp.spawn")){
-							String point = "*warp*`";
+							String point = "*warp*";
 							teleport(point,sender);
 						}
 					}
@@ -183,43 +202,43 @@ public class SimpleMyPoints extends JavaPlugin implements Listener {
 						}
 					}
 					else{
-						sender.sendMessage(ChatColor.RED + "□ コマンドが不正です。(理由：引数が多すぎます)");
+						Messages.getArgumentTooMany(sender);
 					}
 				}
 				//地点の詳細を表示するコマンド
 				else if(args[0].equalsIgnoreCase("detail")){
 					if(sender.hasPermission("smp.detail")){
 						if(args.length == 1){
-							sender.sendMessage(ChatColor.AQUA + "□ /points detail <地点名> : 登録地点の詳細を確認します");
+							sender.sendMessage(ChatColor.AQUA + "□ /" + command + " detail <地点名> : 登録地点の詳細を確認します");
 						}
 						else if(args.length == 2){
 							String point = args[1].toString();
 							detail(point , sender);
 						}
 						else{
-							sender.sendMessage(ChatColor.RED + "□ コマンドが不正です。(理由：引数が多すぎます)");
+							Messages.getArgumentTooMany(sender);
 						}
 					}
 					else{
-						sender.sendMessage(ChatColor.RED + "□ パーミッションがありません。(smp.detail)");
+						Messages.getPermissonError(sender, "smp.detail");
 					}
 				}
 				//削除するコマンド
 				else if(args[0].equalsIgnoreCase("delete") || args[0].equalsIgnoreCase("remove")){
 					if(sender.hasPermission("smp.delete") || sender.hasPermission("smp.remove")){
 						if(args.length == 1){
-							sender.sendMessage(ChatColor.AQUA + "□ /points " + args[0].toString() + " <地点名> : 登録地点を削除します");
+							sender.sendMessage(ChatColor.AQUA + "□ /"+ command + " " + args[0].toString() + " <地点名> : 登録地点を削除します");
 						}
 						else if(args.length == 2){
 							String point = args[1].toString();
 							deletepoint(point , sender);
 						}
 						else{
-							sender.sendMessage(ChatColor.RED + "□ コマンドが不正です。(理由：引数が多すぎます)");
+							Messages.getArgumentTooMany(sender);
 						}
 					}
 					else{
-						sender.sendMessage(ChatColor.RED + "□ パーミッションがありません。(smp.remove/smp.delete)");
+						Messages.getPermissonError(sender, "smp.remove/smp.delete");
 					}
 				}
 				else{
@@ -257,7 +276,7 @@ public class SimpleMyPoints extends JavaPlugin implements Listener {
 					}
 				}
 				else{
-					sender.sendMessage(ChatColor.RED + "□ コマンドが不正です。(理由：引数が多すぎます)");
+					Messages.getArgumentTooMany(sender);
 				}
 			}
 		}
@@ -366,7 +385,7 @@ public class SimpleMyPoints extends JavaPlugin implements Listener {
 		FileConfiguration tf = this.getConfig();
 
 		if(tf.getString("points." + point + ".world") == null || tf.getString("points." + point + ".x") == null || tf.getString("points." + point + ".y") == null || tf.getString("points." + point + ".z") == null){
-			sender.sendMessage(ChatColor.RED + "□ "+ point + "は登録されていないためテレポートできませんでした。");
+			Messages.getNotingPoint(sender, point);
 		}
 		else if(sender.hasPermission("smp.use." + point)){
 			String getworld = this.getConfig().getString("points." + point + ".world");
@@ -385,8 +404,6 @@ public class SimpleMyPoints extends JavaPlugin implements Listener {
 			location.setPitch(getpitch);
 			Player player = (Player) sender;
 			player.teleport(location);
-
-
 
 			sender.sendMessage(ChatColor.AQUA + "□ 登録地点 " + point + " にテレポートしました。");
 		}
@@ -418,26 +435,4 @@ public class SimpleMyPoints extends JavaPlugin implements Listener {
 		}
 	}
 
-	public void title(CommandSender sender){
-		sender.sendMessage("");
-		sender.sendMessage(ChatColor.GOLD + "-------- SimpleMyPoints --------");
-	}
-
-	public void help (CommandSender sender){
-		sender.sendMessage(ChatColor.AQUA + " /points help : ヘルプを表示");
-		sender.sendMessage(ChatColor.AQUA + " /points version : バージョンを表示");
-		sender.sendMessage(ChatColor.AQUA + " /points warp <地点名> : 登録地点へテレポート");
-		sender.sendMessage(ChatColor.AQUA + " /points add <地点名> : 登録地点を追加");
-		sender.sendMessage(ChatColor.AQUA + " /points detail <地点名> : 登録地点の詳細を表示");
-		sender.sendMessage(ChatColor.AQUA + " /points delete <地点名> : 登録地点を削除");
-		sender.sendMessage(ChatColor.AQUA + " /points yaw <地点名> <方角> : 登録地点の方角をセット");
-		sender.sendMessage(ChatColor.AQUA + " /warp <地点名> : 登録地点へテレポート");
-		sender.sendMessage("");
-	}
-
-	public void auther (CommandSender sender){
-		sender.sendMessage(ChatColor.AQUA + " Version : " + version);
-		sender.sendMessage(ChatColor.AQUA + " Auther  : syokkendesuyo");
-		sender.sendMessage("");
-	}
 }
